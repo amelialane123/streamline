@@ -1,5 +1,5 @@
 import './App.css';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 //TODO: create list component that creates the listOfLists
 //watchlist DONE (i think)
@@ -14,6 +14,7 @@ function Watchlist({list, onChecked}){
                 <label htmlFor={list.listName}>{list.listName}</label>
                 <input 
                     id={list.listName} 
+                    key={list.listName}
                     type="checkbox"
                     value={list.listName}
                     onChange={(e) => onChecked({list})}
@@ -34,13 +35,14 @@ function Watchlists({lists, onChecked}){
 
 function WatchlistEditView({lists, nameInput, handleClick, onNameInput, onChecked}){
     //component for mapping 
-    const listOfLists = Watchlists({lists, onChecked});
+    const listOfLists = lists.length > 0 ? Watchlists({ lists, onChecked }) : null;
 
     return(
         <div className="center">
             <div>{listOfLists}</div>
             <input
                 id="addList" 
+                key="newList"
                 className="center" 
                 type="text" 
                 placeholder="new list title..."
@@ -48,7 +50,7 @@ function WatchlistEditView({lists, nameInput, handleClick, onNameInput, onChecke
                 onChange={(e) => onNameInput(e.target.value)}
              />
             <label htmlFor="addList">
-                <button onClick= {() => handleClick()}>
+                <button id="addList" onClick= {() => handleClick()}>
                     Add List +
                 </button>
             </label>
@@ -77,10 +79,22 @@ function RemoveWatchlists({checked, handleRemove}){
 
 function MyLists(){
 
+    const getInitialLists = () => {
+        const initialLists = localStorage.getItem('MY_LISTS');
+        return (initialLists!==null ? JSON.parse(initialLists) : [{listName:'Watched'}])
+    }
+   
     //state
-    const [lists, setLists] = useState([{listName:'Watched'} ]);
+    const [lists, setLists] = useState(getInitialLists);
     const [nameInput, setNameInput] = useState('Hello');
     const [checked, setChecked] = useState([]);
+
+    //effect
+    useEffect(()=>{
+        localStorage.setItem('MY_LISTS', JSON.stringify(lists));
+    }, [lists])
+
+    //event handlers
 
     function handleClick(){
         //if already has the list 
@@ -96,6 +110,10 @@ function MyLists(){
             setNameInput("");
         }
     }
+    
+    
+
+    //event handlers
 
     function handleCheck({list}){
         //check if this was checked or unchecked
@@ -146,5 +164,3 @@ function MyLists(){
 
 }
 export default MyLists;
-
-

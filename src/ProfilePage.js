@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 function MostWatchedPlatform({platforms}){
@@ -91,7 +91,7 @@ function IntoOptionList({platform}){
 
 
 //shows list of platforms the user has 
-function UserPlatformList({usersPlatforms, onChecked}){
+function UserPlatformList({usersPlatforms, onChecked, availablePlatforms, handleAdd}){
 if(usersPlatforms.length === 0){
   return;
 }
@@ -103,6 +103,10 @@ if(usersPlatforms.length === 0){
     <div className="section">
       <h1 className="section-header">PLATFORMS</h1>
       <div>{platformNames}</div>
+      <AddPlatform 
+        availablePlatforms={availablePlatforms} 
+        handleAdd={handleAdd}
+      />
     </div>
   );
 }
@@ -111,7 +115,7 @@ function IntoCheckList({platform, onChecked}){
 
   return(
     <div key={platform.name} >
-        <span className = "checkbx">
+        <span className = "checkbox">
             <label htmlFor={platform.name}>{platform.name}</label>
             <input 
                 id={platform.name} 
@@ -142,18 +146,35 @@ function RemoveSelected({checked, handleRemove}){
 
 
 function ProfilePage() {
+
+  const getInitialUserPlatforms = ()=>{
+    const initialUserPlatforms = localStorage.getItem('USER_PLATFORMS');
+    console.log('initialUser', initialUserPlatforms);
+    console.log('initial',initialUserPlatforms!== null ? JSON.parse(initialUserPlatforms) : [{name:"Netflix", mostWatched: true}])
+    return(initialUserPlatforms !== null ? JSON.parse(initialUserPlatforms):[{name:'Netflix', mostWatched: true}])
+  }
+  const getInitialAvailablePlatforms = ()=>{
+    const initialAvailablePlatforms = localStorage.getItem('AVAILABLE_PLATFORMS');
+    return(initialAvailablePlatforms!==null ? JSON.parse(initialAvailablePlatforms) : 
+    [{name:'Hulu', mostWatched: false},
+    {name:'Prime Video', mostWatched: false},
+    {name:'HBO Max', mostWatched: false},
+    {name:'Peacock', mostWatched: false}])
+  }
+
     //state
-    const [usersPlatforms, setusersPlatforms] = useState([
-        {name:'Netflix', mostWatched: true},
-    ]);
-    const [availablePlatforms,setavailablePlatforms] = useState([
-      {name:'Hulu', mostWatched: false},
-      {name:'Prime Video', mostWatched: false},
-      {name:'HBO Max', mostWatched: false},
-      {name:'Peacock', mostWatched: false}
-    ]);
+    const [usersPlatforms, setusersPlatforms] = useState(getInitialUserPlatforms);
+    const [availablePlatforms,setavailablePlatforms] = useState(getInitialAvailablePlatforms);
     const [checked,setChecked] = useState([]);
 
+    //effect
+    useEffect(()=>{
+      localStorage.setItem('USER_PLATFORMS', JSON.stringify(usersPlatforms));
+  }, [usersPlatforms])
+
+  useEffect(()=>{
+    localStorage.setItem('AVAILABLE_PLATFORMS', JSON.stringify(availablePlatforms));
+}, [availablePlatforms])
 
     //event handlers
 
@@ -201,8 +222,6 @@ function ProfilePage() {
   }
     
 
-
-
   const PLATFORMS=[
     {name:'Netflix', mostWatched: true},
     {name:'Hulu', mostWatched: false},
@@ -210,6 +229,7 @@ function ProfilePage() {
     {name:'HBO Max', mostWatched: false},
     {name:'Peacock', mostWatched: false}
   ];
+
 
   const SHOWS= [
     {title: "New Girl", platforms: ['Hulu', 'Peacock'], genre:'comedy', mostWatched: true, stats: {time: 3.4, episodesWatched: 146, started: 4/27/2004}},
@@ -223,17 +243,19 @@ function ProfilePage() {
     <div>
       <UserPlatformList 
         usersPlatforms ={usersPlatforms} 
-        onChecked = {handleCheck} 
-      />
-      <AddPlatform 
-        availablePlatforms={availablePlatforms}
+        onChecked = {handleCheck}
+        availablePlatforms={availablePlatforms} 
         handleAdd = {handleAdd}
       />
+      {/* <AddPlatform 
+        availablePlatforms={availablePlatforms}
+        handleAdd = {handleAdd}
+      /> */}
       <RemoveSelected 
         checked = {checked}
         handleRemove = {handleRemove}
       />
-      <Statistics shows ={SHOWS} platforms= {PLATFORMS} />
+      <Statistics shows ={SHOWS} platforms= {usersPlatforms} />
     </div>
     
 
