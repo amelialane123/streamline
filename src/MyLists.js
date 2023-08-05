@@ -63,9 +63,6 @@ function WatchlistEditView({lists, nameInput, handleClick, onNameInput, onChecke
                     </button>
                 </label>
             </div>
-            <Routes>
-
-            </Routes>
         </div>
     )
 

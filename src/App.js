@@ -1,4 +1,5 @@
 import './App.css';
+import {useState} from 'react';
 import ProfilePage from './ProfilePage.js';
 import Home from './Home.js';
 import MyLists from './MyLists.js';
@@ -13,6 +14,9 @@ import {
 
 
 function App() {
+
+  //state
+  const [lists, setLists] = useState([]);
 
 
   return (

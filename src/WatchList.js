@@ -8,7 +8,11 @@ function WatchList({list}){
     console.log("hello");
     console.log({list});
     return(
-        <h1>{list.list.listName}</h1>
+        <div>
+            <hr />
+            <h1> LIST: {list.list.listName}</h1>
+        </div>
+        
 
     )
 }
