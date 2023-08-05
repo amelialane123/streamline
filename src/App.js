@@ -1,5 +1,5 @@
 import './App.css';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import ProfilePage from './ProfilePage.js';
 import Home from './Home.js';
 import MyLists from './MyLists.js';
@@ -15,9 +15,18 @@ import {
 
 function App() {
 
-  //state
-  const [lists, setLists] = useState([]);
+  const getInitialLists = () => {
+    const initialLists = localStorage.getItem('MY_LISTS');
+    return (initialLists!==null ? JSON.parse(initialLists) : [{listName:'Watched', shows:[]}])
+  }
 
+  //state
+  const [lists, setLists] = useState(getInitialLists);
+
+  //effect
+  useEffect(()=>{
+    localStorage.setItem('MY_LISTS', JSON.stringify(lists));
+  }, [lists])
 
   return (
       <BrowserRouter>
@@ -36,8 +45,20 @@ function App() {
             </nav>
             <hr />
             <Routes>
-              <Route exact path='/' element= {<Home />} />
-              <Route exact path='/mylists/*' element= {<MyLists />} />
+              <Route exact path='/' 
+                element= {
+                  <Home
+                    lists={lists}
+                    setLists={setLists}
+                  />
+                }   
+              />
+              <Route exact path='/mylists/*' 
+                element= {
+                <MyLists 
+                  lists={lists}
+                  setLists={setLists}
+                />} />
               <Route exact path="/profilepage" element={<ProfilePage />} />
             </Routes>
           </div>

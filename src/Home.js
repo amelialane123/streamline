@@ -39,40 +39,55 @@ function ShowList({allShows, handleCheck}){
 }
 
 //TODO: add in watchlists so that the options are the watchlists to add
-function AddToWatchlist({checked, handleAdd}){
-    if(checked.length === 0){
+function AddToWatchlist({checked, handleAdd, lists}){
+    if(checked.length === 0 || lists.length === 0){
         return;
     }
-    let options = [];
-    if(checked.length >0){
-    options = checked.map((show) => IntoOptionList({show}));
-    }
-
+   
+    let options = lists.map((list) => IntoOptionList({list}));
+    
     return(
         <select
             id="addToWatchlistButton"
             className="button"
-            onChange = {() => handleAdd()}>
+            onChange = {(e) => handleAdd(e)}>
             <option>Add to Watchlist + </option>
-            <option>{options}</option>
+            {options}
         </select>
     )
 }
 
-function IntoOptionList({show}){
+function IntoOptionList({list}){
     return(
         <option
-          id={show.title} 
-          value={show.title}
-          key={show.title}
+          id={list.listName} 
+          value={list.listName}
+          key={list.listName}
         >
-          {show.title}
+          {list.listName}
         </option>    
   )
 }
 
+//checks if a show already exists in a list
+function ShowInList({list, show}){
+    const existingShowIndex = list.shows.findIndex((el) => el.title === show.title);
+    if(existingShowIndex !== -1){
+        console.log("You already have this show");
+        return;
+    }
+    else{
+       return(<AddIndividualShow list={list} show={show} />)
+    }
+}
 
-function Home(){
+function AddIndividualShow({list,show}){
+    const listShows = [{...list.shows}.concat({show})];
+    return listShows;
+}
+
+
+function Home({lists, setLists}){
     //state
     const [checked, setChecked] = useState([]);
 
@@ -88,30 +103,54 @@ function Home(){
     function handleCheck({show}){
         //check if this was checked or unchecked
         let newArray = [];
-        newArray= checked.concat({show});
+        newArray= checked.concat(show);
         //if already checked - want to remove
-        if(checked.some((element)=> element.show.title === show.title)){
+        if(checked.some((element)=> element.title === show.title)){
             console.log("true")
-            newArray = newArray.filter((checkedShow) => checkedShow.show.title !== show.title);
-        }
-        else{
-            console.log("false");
+            newArray = newArray.filter((checkedShow) => checkedShow.title !== show.title);
         }
         setChecked(newArray)
         console.log('checked', {checked})
     }
 
     //add shows to watchlist
-    function handleAdd(){
-       
+    /*
+    Must add all of the checked shows to the shows array of the selected watchlist
+    */
+    function handleAdd(e){
+        let index = e.target.selectedIndex;
+        const el = e.target.childNodes[index]
+        const watchlistName =  el.getAttribute('id'); 
+
+        //if the shows array is empty just add the checked array
+        let watchListToUpdate = lists.find((watchlist) => watchlist.listName === watchlistName);
+        index = lists.findIndex((watchlist) => watchlist.listName === watchlistName);
+        if(!watchListToUpdate.shows){
+            watchListToUpdate.shows = [...checked];
+        }
+        //otherwise check if each show is already in the list 
+        else{
+
+            // // watchListToUpdate.shows = checked.map((show) => <ShowInList list={watchListToUpdate} show={show} />);
+
+            // console.log('watchListToUpdateShows',checked.map((show) => <ShowInList list={watchListToUpdate} show={show} />) )
+
+            // console.log('updated', [{...watchListToUpdate.shows}, ...checked.map((show) => <ShowInList list={watchListToUpdate} show={show} />)] )
+           
+            watchListToUpdate.shows = [...watchListToUpdate.shows, ...checked];
+        }
+        console.log('watchListToUpdateShows', watchListToUpdate)
+        setLists(lists.slice(0,index).concat(watchListToUpdate).concat(lists.slice(index + 1)));
     }
+
+
 
 
     return(
         <div>
             <h1>HOME</h1>
             <ShowList allShows = {SHOWS} handleCheck = {handleCheck} />
-            <AddToWatchlist checked = {checked} handleAdd= {handleAdd}/>
+            <AddToWatchlist checked = {checked} handleAdd= {handleAdd} lists={lists} setLists={setLists} />
         </div>
     )
 }

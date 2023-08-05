@@ -85,23 +85,23 @@ function RemoveWatchlists({checked, handleRemove}){
 }
 
 
-function MyLists(){
+function MyLists({lists, setLists}){
 
-    const getInitialLists = () => {
-        const initialLists = localStorage.getItem('MY_LISTS');
-        return (initialLists!==null ? JSON.parse(initialLists) : [{listName:'Watched'}])
-    }
+    // const getInitialLists = () => {
+    //     const initialLists = localStorage.getItem('MY_LISTS');
+    //     return (initialLists!==null ? JSON.parse(initialLists) : [{listName:'Watched'}])
+    // }
    
     //state
-    const [lists, setLists] = useState(getInitialLists);
+    //const [lists, setLists] = useState(getInitialLists);
     const [nameInput, setNameInput] = useState('Hello');
     const [checked, setChecked] = useState([]);
     const [currentList, setCurrentList] = useState();
 
     //effect
-    useEffect(()=>{
-        localStorage.setItem('MY_LISTS', JSON.stringify(lists));
-    }, [lists])
+    // useEffect(()=>{
+    //     localStorage.setItem('MY_LISTS', JSON.stringify(lists));
+    // }, [lists])
 
     //event handlers
     function handleClick(){
@@ -118,7 +118,7 @@ function MyLists(){
             return;
         }
         else{
-            const updatedLists = lists.concat({listName:nameInput});
+            const updatedLists = lists.concat({listName:nameInput, shows:[]});
             setLists(updatedLists);
             setNameInput("");
         }
