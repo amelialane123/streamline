@@ -1,5 +1,12 @@
 import './App.css';
+import WatchList from './WatchList.js';
 import {useState, useEffect} from 'react';
+import {
+    BrowserRouter,
+    Route,
+    Routes,
+    Link,
+  } from 'react-router-dom'
 
 //TODO: create list component that creates the listOfLists
 //watchlist DONE (i think)
@@ -7,11 +14,11 @@ import {useState, useEffect} from 'react';
 //watchlistEditView
 
 //maps the watchlist to the watchlists component 
-function Watchlist({list, onChecked}){
+function Watchlist({list, onChecked, onWatchlist}){
     return(
         <div key={list.listName} className="watchList">
             <span className="checkbox">
-                <label htmlFor={list.listName}>{list.listName}</label>
+                <label htmlFor={list.listName} onClick ={() => onWatchlist({list})}><Link to='mylists/watchList'>{list.listName}</Link></label>
                 <input 
                     id={list.listName} 
                     key={list.listName}
@@ -25,37 +32,41 @@ function Watchlist({list, onChecked}){
 }
 
 //creates a list of all watchlists 
-function Watchlists({lists, onChecked}){
-    const listOfLists = lists.map((list) => Watchlist({list, onChecked}));
+function Watchlists({lists, onChecked, onWatchlist}){
+    const listOfLists = lists.map((list) => Watchlist({list, onChecked, onWatchlist}));
 
     return (listOfLists);
 
 }
 
 
-function WatchlistEditView({lists, nameInput, handleClick, onNameInput, onChecked}){
+function WatchlistEditView({lists, nameInput, handleClick, onNameInput, onChecked, onWatchlist}){
     //component for mapping 
-    const listOfLists = lists.length > 0 ? Watchlists({ lists, onChecked }) : null;
+    const listOfLists = lists.length > 0 ? Watchlists({ lists, onChecked, onWatchlist }) : null;
 
     return(
-        <div className="center">
-            <div>{listOfLists}</div>
-            <input
-                id="addList" 
-                key="newList"
-                className="center" 
-                type="text" 
-                placeholder="new list title..."
-                value = {nameInput}
-                onChange={(e) => onNameInput(e.target.value)}
-             />
-            <label htmlFor="addList">
-                <button id="addList" onClick= {() => handleClick()}>
-                    Add List +
-                </button>
-            </label>
+        <div>
+            <div className="center">
+                <div>{listOfLists}</div>
+                <input
+                    id="addList" 
+                    key="newList"
+                    className="center" 
+                    type="text" 
+                    placeholder="new list title..."
+                    value = {nameInput}
+                    onChange={(e) => onNameInput(e.target.value)}
+                />
+                <label htmlFor="addList">
+                    <button id="addList" onClick= {() => handleClick()}>
+                        Add List +
+                    </button>
+                </label>
+            </div>
+            <Routes>
+
+            </Routes>
         </div>
-        
     )
 
 }
@@ -88,6 +99,7 @@ function MyLists(){
     const [lists, setLists] = useState(getInitialLists);
     const [nameInput, setNameInput] = useState('Hello');
     const [checked, setChecked] = useState([]);
+    const [currentList, setCurrentList] = useState();
 
     //effect
     useEffect(()=>{
@@ -95,7 +107,6 @@ function MyLists(){
     }, [lists])
 
     //event handlers
-
     function handleClick(){
         //if already has the list 
         const existingListIndex = lists.findIndex((list) => list.listName === nameInput);
@@ -104,16 +115,17 @@ function MyLists(){
             setNameInput("")
             return;
         }
+        else if(!nameInput.replace(/\s/g, '').length){
+            console.log("Cannot be only white space!")
+            setNameInput("");
+            return;
+        }
         else{
             const updatedLists = lists.concat({listName:nameInput});
             setLists(updatedLists);
             setNameInput("");
         }
     }
-    
-    
-
-    //event handlers
 
     function handleCheck({list}){
         //check if this was checked or unchecked
@@ -152,11 +164,15 @@ function MyLists(){
                 handleClick={handleClick}
                 onNameInput = {setNameInput}
                 onChecked={handleCheck}
+                onWatchlist = {setCurrentList}
             />
             <RemoveWatchlists 
                 checked={checked} 
                 handleRemove = {handleRemove}
             />
+            <Routes>
+                <Route path = 'mylists/watchList' element= {<WatchList list={currentList}/>} />
+            </Routes>
             
         </div>
       )
