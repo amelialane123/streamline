@@ -94,7 +94,7 @@ function MyLists({lists, setLists}){
    
     //state
     //const [lists, setLists] = useState(getInitialLists);
-    const [nameInput, setNameInput] = useState('Hello');
+    const [nameInput, setNameInput] = useState('New list title...');
     const [checked, setChecked] = useState([]);
     const [currentList, setCurrentList] = useState();
 

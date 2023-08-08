@@ -72,3 +72,12 @@ li{
   margin-top:15px;
   margin-bottom:15px;
 }
+
+.listTitle{
+  margin-top:15px;
+  color:  rgb(8, 121, 186);
+}
+
+hr{
+  margin: 10px;
+}
