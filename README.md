@@ -1,3 +1,9 @@
+This project is a work in progress. I plan to create a website where one can have access to all their streaming platforms in one location, making it easier to remember all shows you have started or want to watch and to find a new show to begin. This is a personal project I began as a way to familiarize myself with web development langauges/tools such as JavaScript, CSS, HTML, and React. 
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
